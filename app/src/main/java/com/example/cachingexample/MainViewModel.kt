@@ -27,13 +27,16 @@ class MainViewModel(
     private fun loadPokemon(id: Int) {
         loadPokemon?.cancel()
         loadPokemon = viewModelScope.launch {
+            val config = Pokemon.Fetch(
+                abilities = Ability.Fetch(
+                    pokemon = Pokemon.Fetch()
+                )
+            )
             pokemonRepository.getById(
                 id = id,
-                configuration = Pokemon.Fetch(
-                    abilities = Ability.Fetch()
-                )
+                configuration = config
             ).collect {
-                state = state.copy(pokemon = it)
+                if (it.isConfigSatisfied(config, true)) state = state.copy(pokemon = it)
             }
         }
     }

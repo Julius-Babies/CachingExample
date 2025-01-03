@@ -3,6 +3,7 @@ package com.example.cachingexample.data.source.cache
 import android.util.Log
 import com.example.cachingexample.data.source.database.PokemonDatabase
 import com.example.cachingexample.data.source.database.model.DbPokemon
+import com.example.cachingexample.data.source.database.model.crossover.DbPokemonAbilityCrossover
 import com.example.cachingexample.model.Ability
 import com.example.cachingexample.model.Cacheable
 import com.example.cachingexample.model.Pokemon
@@ -35,14 +36,14 @@ class PokemonSource(
             Cacheable.Uninitialized(it.ability.url.split("/").last { pathSegment -> pathSegment.isNotEmpty() })
         }.sortedBy { it.getItemId() })
         pokemonDatabase.pokemonDao.upsert(
-            listOf(
+            pokemons = listOf(
                 DbPokemon(
                     id = pokemon.id,
                     name = pokemon.name,
-                    abilities = pokemon.abilities.joinToString("|") { it.getItemId() },
                     cachedAt = Instant.now()
                 )
-            )
+            ),
+            abilities = pokemon.abilities.map { DbPokemonAbilityCrossover(pokemon.id, it.getItemId().toInt()) }
         )
         emitAll(getById(id))
     }

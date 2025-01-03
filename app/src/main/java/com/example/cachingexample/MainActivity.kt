@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -109,9 +110,23 @@ class MainActivity : ComponentActivity() {
                                     CircularProgressIndicator()
                                 }
                                 is Cacheable.Loaded -> {
-                                    Text(state.pokemon.value.name)
+                                    Text("Pokemon ${state.pokemon.value.name} hat folgende Fähigkeiten:")
                                     state.pokemon.value.abilities.forEach { ability ->
-                                        Text("  $ability")
+                                        when (ability) {
+                                            is Cacheable.Uninitialized -> Text("Fähigkeit ${ability.id}")
+                                            is Cacheable.Loading -> CircularProgressIndicator()
+                                            is Cacheable.Loaded -> {
+                                                Text("Fähigkeit ${ability.value.name}, diese haben auch:")
+                                                ability.value.pokemon.forEach { pokemonWithAbility ->
+                                                    when (pokemonWithAbility) {
+                                                        is Cacheable.Uninitialized -> Text("Pokemon ${pokemonWithAbility.id}")
+                                                        is Cacheable.Loading -> CircularProgressIndicator()
+                                                        is Cacheable.Loaded -> Text("Pokemon ${pokemonWithAbility.value.name}")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        HorizontalDivider()
                                     }
                                 }
                             }

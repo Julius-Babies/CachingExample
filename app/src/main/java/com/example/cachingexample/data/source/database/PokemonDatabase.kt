@@ -8,12 +8,14 @@ import com.example.cachingexample.data.source.database.dao.AbilityDao
 import com.example.cachingexample.data.source.database.dao.PokemonDao
 import com.example.cachingexample.data.source.database.model.DbAbility
 import com.example.cachingexample.data.source.database.model.DbPokemon
+import com.example.cachingexample.data.source.database.model.crossover.DbPokemonAbilityCrossover
 
 @Database(
     version = 1,
     entities = [
         DbAbility::class,
         DbPokemon::class,
+        DbPokemonAbilityCrossover::class
     ]
 )
 @TypeConverters(

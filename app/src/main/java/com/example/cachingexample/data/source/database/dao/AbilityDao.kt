@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.example.cachingexample.data.source.database.model.DbAbility
+import com.example.cachingexample.data.source.database.model.embedded.EmbeddedAbility
 
 @Dao
 interface AbilityDao {
@@ -12,5 +13,5 @@ interface AbilityDao {
     suspend fun upsert(abilities: List<DbAbility>)
 
     @Query("SELECT * FROM abilities WHERE id = :id")
-    suspend fun getById(id: Int): DbAbility?
+    suspend fun getById(id: Int): EmbeddedAbility?
 }
