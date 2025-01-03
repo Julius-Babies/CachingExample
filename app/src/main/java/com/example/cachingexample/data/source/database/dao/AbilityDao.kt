@@ -1,9 +1,9 @@
-package com.example.cachingexample.database.dao
+package com.example.cachingexample.data.source.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.cachingexample.database.model.DbAbility
+import com.example.cachingexample.data.source.database.model.DbAbility
 
 @Dao
 interface AbilityDao {

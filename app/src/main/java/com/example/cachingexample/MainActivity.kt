@@ -18,9 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.cachingexample.database.PokemonDatabase
+import com.example.cachingexample.data.source.cache.AbilitySource
+import com.example.cachingexample.data.source.cache.PokemonSource
+import com.example.cachingexample.data.source.database.PokemonDatabase
 import com.example.cachingexample.model.Cacheable
-import com.example.cachingexample.model.PokemonFinder
 import com.example.cachingexample.repository.AbilityRepository
 import com.example.cachingexample.repository.PokemonRepository
 import com.example.cachingexample.ui.theme.CachingExampleTheme
@@ -32,9 +33,13 @@ import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.compose.koinInject
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+
+lateinit var pokemonRepository: PokemonRepository
+lateinit var abilityRepository: AbilityRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,14 +67,20 @@ class MainActivity : ComponentActivity() {
                                     install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
                                 }
                             }
+                            singleOf(::AbilitySource)
+                            singleOf(::PokemonSource)
                             singleOf(::AbilityRepository)
                             singleOf(::PokemonRepository)
-                            singleOf(::PokemonFinder)
-                            viewModelOf(::MainViewModel)
+
+                            viewModel { MainViewModel(get()) }
                         }
                     )
                 }
             ) {
+
+                abilityRepository = koinInject()
+                pokemonRepository = koinInject()
+
                 val viewModel = koinViewModel<MainViewModel>()
                 val state = viewModel.state
 

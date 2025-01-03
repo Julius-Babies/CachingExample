@@ -1,4 +1,4 @@
-package com.example.cachingexample.database.model
+package com.example.cachingexample.data.source.database.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

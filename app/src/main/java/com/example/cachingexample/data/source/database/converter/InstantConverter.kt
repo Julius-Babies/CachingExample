@@ -1,4 +1,4 @@
-package com.example.cachingexample.database.converter
+package com.example.cachingexample.data.source.database.converter
 
 import androidx.room.TypeConverter
 import java.time.Instant

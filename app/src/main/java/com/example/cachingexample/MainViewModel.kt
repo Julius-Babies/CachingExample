@@ -5,15 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cachingexample.model.Ability
 import com.example.cachingexample.model.Cacheable
-import com.example.cachingexample.model.NestedItemConfiguration
 import com.example.cachingexample.model.Pokemon
-import com.example.cachingexample.model.PokemonFinder
+import com.example.cachingexample.repository.PokemonRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val pokemonFinder: PokemonFinder,
+    private val pokemonRepository: PokemonRepository
 ) : ViewModel() {
     var state by mutableStateOf(MainState())
         private set
@@ -27,10 +27,10 @@ class MainViewModel(
     private fun loadPokemon(id: Int) {
         loadPokemon?.cancel()
         loadPokemon = viewModelScope.launch {
-            pokemonFinder(
+            pokemonRepository.getById(
                 id = id,
-                configuration = Pokemon.NestedElementConfiguration(
-                    abilities = NestedItemConfiguration.Fetch
+                configuration = Pokemon.Fetch(
+                    abilities = Ability.Fetch()
                 )
             ).collect {
                 state = state.copy(pokemon = it)

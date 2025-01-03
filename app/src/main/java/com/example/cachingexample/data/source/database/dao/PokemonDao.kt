@@ -1,9 +1,9 @@
-package com.example.cachingexample.database.dao
+package com.example.cachingexample.data.source.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.cachingexample.database.model.DbPokemon
+import com.example.cachingexample.data.source.database.model.DbPokemon
 
 @Dao
 interface PokemonDao {
@@ -13,4 +13,7 @@ interface PokemonDao {
 
     @Query("SELECT * FROM pokemons WHERE id = :id")
     suspend fun getById(id: Int): DbPokemon?
+
+    @Query("SELECT * FROM pokemons")
+    suspend fun getAll(): List<DbPokemon>
 }
