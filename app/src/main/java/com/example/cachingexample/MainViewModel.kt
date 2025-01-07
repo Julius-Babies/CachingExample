@@ -5,15 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cachingexample.model.Ability
-import com.example.cachingexample.model.Cacheable
 import com.example.cachingexample.model.Pokemon
-import com.example.cachingexample.repository.PokemonRepository
+import com.example.cachingexample.repository.Item
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val pokemonRepository: PokemonRepository
 ) : ViewModel() {
     var state by mutableStateOf(MainState())
         private set
@@ -27,16 +24,10 @@ class MainViewModel(
     private fun loadPokemon(id: Int) {
         loadPokemon?.cancel()
         loadPokemon = viewModelScope.launch {
-            val config = Pokemon.Fetch(
-                abilities = Ability.Fetch(
-                    pokemon = Pokemon.Fetch()
-                )
-            )
-            pokemonRepository.getById(
+            App.pokemonSource.getById(
                 id = id,
-                configuration = config
-            ).collect {
-                if (it.isConfigSatisfied(config, true)) state = state.copy(pokemon = it)
+            ).let {
+                state = state.copy(pokemon = it)
             }
         }
     }
@@ -58,7 +49,7 @@ class MainViewModel(
 }
 
 data class MainState(
-    val pokemon: Cacheable<Pokemon> = Cacheable.Uninitialized("1"),
+    val pokemon: Item<Pokemon>? = null,
     val currentId: Int = 1
 )
 

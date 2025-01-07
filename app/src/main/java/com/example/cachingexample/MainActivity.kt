@@ -15,6 +15,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.room.Room
@@ -22,9 +24,9 @@ import androidx.room.RoomDatabase
 import com.example.cachingexample.data.source.cache.AbilitySource
 import com.example.cachingexample.data.source.cache.PokemonSource
 import com.example.cachingexample.data.source.database.PokemonDatabase
-import com.example.cachingexample.model.Cacheable
-import com.example.cachingexample.repository.AbilityRepository
-import com.example.cachingexample.repository.PokemonRepository
+import com.example.cachingexample.model.Pokemon
+import com.example.cachingexample.model.example
+import com.example.cachingexample.repository.ItemFlow
 import com.example.cachingexample.ui.theme.CachingExampleTheme
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -39,8 +41,10 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-lateinit var pokemonRepository: PokemonRepository
-lateinit var abilityRepository: AbilityRepository
+object App {
+    lateinit var abilitySource: AbilitySource
+    lateinit var pokemonSource: PokemonSource
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,17 +74,19 @@ class MainActivity : ComponentActivity() {
                             }
                             singleOf(::AbilitySource)
                             singleOf(::PokemonSource)
-                            singleOf(::AbilityRepository)
-                            singleOf(::PokemonRepository)
 
-                            viewModel { MainViewModel(get()) }
+                            viewModel { MainViewModel() }
                         }
                     )
                 }
             ) {
 
-                abilityRepository = koinInject()
-                pokemonRepository = koinInject()
+                App.abilitySource = koinInject()
+                App.pokemonSource = koinInject()
+
+                LaunchedEffect(true) {
+                    example()
+                }
 
                 val viewModel = koinViewModel<MainViewModel>()
                 val state = viewModel.state
@@ -102,32 +108,31 @@ class MainActivity : ComponentActivity() {
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text("ID: ${state.currentId}")
                             }
-                            when (state.pokemon) {
-                                is Cacheable.Uninitialized -> {
-                                    Text("Uninitialized")
-                                }
-                                is Cacheable.Loading -> {
-                                    CircularProgressIndicator()
-                                }
-                                is Cacheable.Loaded -> {
-                                    Text("Pokemon ${state.pokemon.value.name} hat folgende Fähigkeiten:")
-                                    state.pokemon.value.abilities.forEach { ability ->
-                                        when (ability) {
-                                            is Cacheable.Uninitialized -> Text("Fähigkeit ${ability.id}")
-                                            is Cacheable.Loading -> CircularProgressIndicator()
-                                            is Cacheable.Loaded -> {
-                                                Text("Fähigkeit ${ability.value.name}, diese haben auch:")
-                                                ability.value.pokemon.forEach { pokemonWithAbility ->
-                                                    when (pokemonWithAbility) {
-                                                        is Cacheable.Uninitialized -> Text("Pokemon ${pokemonWithAbility.id}")
-                                                        is Cacheable.Loading -> CircularProgressIndicator()
-                                                        is Cacheable.Loaded -> Text("Pokemon ${pokemonWithAbility.value.name}")
-                                                    }
-                                                }
-                                            }
-                                        }
+                            val s = state.pokemon?.flow?.collectAsState(null)
+                            s?.value.let {
+                                when (it) {
+                                    is ItemFlow.Uninitialized<*> -> {
+                                        Text("Uninitialized")
+                                    }
+                                    is ItemFlow.Loading<*> -> {
+                                        CircularProgressIndicator()
+                                    }
+                                    is ItemFlow.Done<Pokemon> -> {
+                                        Text("Pokemon ${it.value.name} hat folgende Fähigkeiten:")
+//                                        it.value.abilities.forEach { ability ->
+//                                            val a = ability.flow.collectAsState(null)
+//                                            a.value.let {
+//                                                when (it) {
+//                                                    is ItemFlow.Uninitialized -> Text("Fähigkeit ${ability.id}")
+//                                                    is ItemFlow.Loading -> CircularProgressIndicator()
+//                                                    is ItemFlow.Done -> Text("Fähigkeit ${it.value.name}")
+//                                                    null -> Text("null")
+//                                                }
+//                                            }
+//                                        }
                                         HorizontalDivider()
                                     }
+                                    null -> Text("null")
                                 }
                             }
                         }

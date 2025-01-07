@@ -19,7 +19,7 @@ data class EmbeddedAbility(
             id = ability.id,
             name = ability.name,
             url = ability.url,
-            pokemon = pokemon.map { Cacheable.Uninitialized(it.pokemonId.toString()) }
+//            pokemon = pokemon.map { Cacheable.Uninitialized(it.pokemonId.toString()) }
         )
     }
 }

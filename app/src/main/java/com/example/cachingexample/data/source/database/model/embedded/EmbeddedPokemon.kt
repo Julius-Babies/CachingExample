@@ -4,7 +4,6 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.example.cachingexample.data.source.database.model.DbPokemon
 import com.example.cachingexample.data.source.database.model.crossover.DbPokemonAbilityCrossover
-import com.example.cachingexample.model.Cacheable
 import com.example.cachingexample.model.Pokemon
 
 data class EmbeddedPokemon(
@@ -18,7 +17,7 @@ data class EmbeddedPokemon(
         return Pokemon(
             id = pokemon.id,
             name = pokemon.name,
-            abilities = abilities.map { Cacheable.Uninitialized(it.abilityId.toString()) }
+            abilityIds = abilities.map { it.abilityId }
         )
     }
 }
