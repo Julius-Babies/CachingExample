@@ -17,6 +17,10 @@ data class Item<T>(
     }
 }
 
+suspend fun <T> List<Item<T>>.waitForValue(): List<T> {
+    return this.map { it.flow.filterIsInstance<ItemFlow.Done<T>>().first().value }
+}
+
 sealed class ItemFlow<T> {
     data class Uninitialized<T>(val id: String) : ItemFlow<T>()
     data class Loading<T>(val id: String): ItemFlow<T>()
