@@ -111,25 +111,25 @@ class MainActivity : ComponentActivity() {
                             val s = state.pokemon?.flow?.collectAsState(null)
                             s?.value.let {
                                 when (it) {
-                                    is ItemFlow.Uninitialized<*> -> {
+                                    is ItemFlow.Uninitialized -> {
                                         Text("Uninitialized")
                                     }
-                                    is ItemFlow.Loading<*> -> {
+                                    is ItemFlow.Loading -> {
                                         CircularProgressIndicator()
                                     }
                                     is ItemFlow.Done<Pokemon> -> {
                                         Text("Pokemon ${it.value.name} hat folgende Fähigkeiten:")
-//                                        it.value.abilities.forEach { ability ->
-//                                            val a = ability.flow.collectAsState(null)
-//                                            a.value.let {
-//                                                when (it) {
-//                                                    is ItemFlow.Uninitialized -> Text("Fähigkeit ${ability.id}")
-//                                                    is ItemFlow.Loading -> CircularProgressIndicator()
-//                                                    is ItemFlow.Done -> Text("Fähigkeit ${it.value.name}")
-//                                                    null -> Text("null")
-//                                                }
-//                                            }
-//                                        }
+                                        it.value.abilities.forEach { ability ->
+                                            val a = ability.flow.collectAsState(null)
+                                            a.value.let {
+                                                when (it) {
+                                                    is ItemFlow.Uninitialized -> Text("Fähigkeit ${ability.id}")
+                                                    is ItemFlow.Loading -> CircularProgressIndicator()
+                                                    is ItemFlow.Done -> Text("Fähigkeit ${it.value.name}")
+                                                    null -> Text("null")
+                                                }
+                                            }
+                                        }
                                         HorizontalDivider()
                                     }
                                     null -> Text("null")
